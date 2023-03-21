@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Audio } from 'react-loader-spinner';
 
 import { fetchPhotos } from 'services/api';
 import Searchbar from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
+import { Button } from 'components/Button/Button';
+import { Loader } from 'components/Loader/Loader';
 
 const STATUS = {
   IDLE: 'idle',
@@ -18,12 +19,13 @@ export class App extends Component {
     searchWord: '',
     images: [],
     totalHits: 0,
-    page: 1,
+    queryPage: 1,
     status: STATUS.IDLE,
   };
 
   handleFormSubmit = async searchWord => {
-    this.setState({ searchWord });
+    this.setState({ queryPage: this.resetPage(), searchWord });
+    const { queryPage } = this.state;
 
     if (searchWord.trim() === '') {
       toast.info('You cannot search by empty field, try again.');
@@ -32,7 +34,7 @@ export class App extends Component {
       try {
         this.setState({ status: STATUS.PENDING });
 
-        const results = await fetchPhotos(searchWord);
+        const results = await fetchPhotos(searchWord, queryPage);
         console.log(results);
         const { totalHits, hits } = results;
 
@@ -54,9 +56,31 @@ export class App extends Component {
     }
   };
 
-  //   pageIncrement = () => {
-  // this.setState(prevState => {{ page: prevState.page + 1 }})
-  //   }
+  handleLoadMore = async () => {
+    this.setState({ queryPage: this.incrementPage(), status: STATUS.PENDING });
+    const { queryPage } = this.state;
+
+    try {
+      const results = await fetchPhotos( queryPage);
+        console.log(results);
+        const { hits } = results;
+      
+      this.setState(prevState => ({
+        images: [...prevState.images, ...hits],
+        status: STATUS.RESOLVED,
+      }));
+    } catch (error) {
+      this.setState({  status: STATUS.REJECTED } );
+    }
+  };
+
+  resetPage() {
+    this.setState({ queryPage: 1 });
+  }
+
+  incrementPage() {
+    this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
+  }
 
   render() {
     const { images, status } = this.state;
@@ -65,21 +89,13 @@ export class App extends Component {
         <Searchbar onSubmit={this.handleFormSubmit} />
         <ToastContainer autoClose={3000} />
 
-        {status === STATUS.PENDING && (
-          <Audio
-            height="80"
-            width="80"
-            radius="9"
-            color="#3f51b5"
-            ariaLabel="loading"
-            wrapperStyle={{
-              display: 'flex',
-              justifyContent: 'center',
-              marginTop: '20px',
-            }}
-          />
+        {status === STATUS.PENDING && <Loader />}
+        {status === STATUS.RESOLVED && (
+          <>
+            <ImageGallery images={images} />
+            <Button onClick={this.handleLoadMore}/>
+          </>
         )}
-        {status === STATUS.RESOLVED && <ImageGallery images={images} />}
       </>
     );
   }

@@ -3,10 +3,10 @@ import axios from 'axios';
 const ENDPOINT = 'https://pixabay.com/api/?';
 const KEY = '33319957-e5644aada7d51fb110ddf6361';
 
-export async function fetchPhotos (value) {
+export async function fetchPhotos (searchQuery, queryPage) {
   const searchParams = new URLSearchParams({
-    q: value,
-    page: 1,
+    q: searchQuery,
+    page: queryPage,
     key: KEY,
     image_type: 'photo',
     orientation: 'orientation',
