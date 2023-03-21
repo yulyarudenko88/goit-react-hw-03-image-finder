@@ -12,5 +12,5 @@ export const ImageGallery = ({ images }) => (
 );
 
 ImageGallery.propTypes = {
-  id: PropTypes.string.isRequired,
+  images: PropTypes.array.isRequired,
 };
