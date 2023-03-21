@@ -14,7 +14,13 @@ const STATUS = {
   REJECTED: 'rejected',
   RESOLVED: 'resolved',
 };
+
 export class App extends Component {
+  // state = {
+  //   pokemon: null,
+  //   error: null,
+  //   status: Status.IDLE,
+  // };
   state = {
     searchWord: '',
     images: [],
@@ -24,9 +30,10 @@ export class App extends Component {
   };
 
   handleFormSubmit = async searchWord => {
-    this.setState({ queryPage: this.resetPage(), searchWord });
+    this.setState({ queryPage: 1, searchWord });
     const { queryPage } = this.state;
-
+    console.log(this.state);
+    
     if (searchWord.trim() === '') {
       toast.info('You cannot search by empty field, try again.');
       return;
@@ -34,10 +41,8 @@ export class App extends Component {
       try {
         this.setState({ status: STATUS.PENDING });
 
-        const results = await fetchPhotos(searchWord, queryPage);
-        console.log(results);
-        const { totalHits, hits } = results;
-
+        const { totalHits, hits } = await fetchPhotos(searchWord, queryPage);
+        console.log(totalHits, hits);        
         if (hits.length === 0) {
           this.setState({ status: STATUS.IDLE });
           toast.warn(
@@ -48,7 +53,7 @@ export class App extends Component {
             images: hits,
             totalHits,
             status: STATUS.RESOLVED,
-          });
+          });          
         }
       } catch (error) {
         this.setState({ status: STATUS.REJECTED });
@@ -59,26 +64,22 @@ export class App extends Component {
   handleLoadMore = async () => {
     this.setState({ queryPage: this.incrementPage(), status: STATUS.PENDING });
     const { queryPage } = this.state;
-
+    console.log(this.state);
     try {
-      const results = await fetchPhotos( queryPage);
-        console.log(results);
-        const { hits } = results;
-      
+      const results = await fetchPhotos(queryPage);
+      console.log(results);
+      const { hits } = results;
+
       this.setState(prevState => ({
         images: [...prevState.images, ...hits],
         status: STATUS.RESOLVED,
       }));
     } catch (error) {
-      this.setState({  status: STATUS.REJECTED } );
+      this.setState({ status: STATUS.REJECTED });
     }
   };
 
-  resetPage() {
-    this.setState({ queryPage: 1 });
-  }
-
-  incrementPage() {
+   incrementPage() {
     this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
   }
 
@@ -93,9 +94,11 @@ export class App extends Component {
         {status === STATUS.RESOLVED && (
           <>
             <ImageGallery images={images} />
-            <Button onClick={this.handleLoadMore}/>
+            <Button onClick={this.handleLoadMore} />
           </>
         )}
+        {status === STATUS.REJECTED &&
+          toast.error('Something wrong, try again.')}
       </>
     );
   }
