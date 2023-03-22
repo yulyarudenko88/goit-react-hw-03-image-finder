@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { fetchPhotos } from 'services/api';
+import { fetchImages } from 'services/api';
 import Searchbar from 'components/Searchbar/Searchbar';
 import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Button } from 'components/Button/Button';
@@ -21,58 +21,58 @@ export class App extends Component {
     showModal: false,
   };
 
-  handleFormSubmit = async searchQuery => {
-    this.setState({ queryPage: 1, searchQuery, loading: true, });
-    const { queryPage } = this.state;
-    // console.log(this.state);
+  componentDidUpdate(_, prevState) {
+    if (prevState.queryPage !== this.state.queryPage) {
+      this.getImages();
+    }
+  }
+
+  getImages = async () => {
+    const { searchQuery, queryPage } = this.state;
+    this.setState({ loading: true });
 
     if (searchQuery.trim() === '') {
       toast.info('You cannot search by empty field, try again.');
-      this.setState({ loading: false, });
+      this.setState({ loading: false });
+
       return;
     } else {
       try {
-        const { totalHits, hits } = await fetchPhotos(searchQuery, queryPage);
-        // console.log(totalHits, hits);
+        const { totalHits, hits } = await fetchImages(searchQuery, queryPage);
+        console.log(totalHits, hits);
+
         if (hits.length === 0) {
           toast.warn(
             'Sorry, there are no images matching your search query. Please try again.'
           );
-          this.setState({ loading: false, });
-        } else {
+          this.setState({ loading: false });
+        } else if (queryPage === 1) {
           this.setState({
             images: hits,
             totalImages: totalHits,
             loading: false,
           });
+        } else {
+          this.setState(prevState => ({
+            images: [...prevState.images, ...hits],
+            loading: false,
+          }));
+          console.log('add new images')
         }
       } catch (error) {
-        this.setState({ error: true, });
+        this.setState({ error: true });
       }
     }
   };
 
-  handleLoadMore = async () => {
-    this.setState({ queryPage: () => this.incrementPage(), loading: true, });
-    const { searchQuery, queryPage } = this.state;
-    // console.log(this.state);
-    try {
-      const results = await fetchPhotos(searchQuery, queryPage);
-      const { hits } = results;
-
-      this.setState(prevState => ({
-        images: [...prevState.images, ...hits],
-        loading: false,
-      }));
-    } catch (error) {
-      this.setState({ error: true, });
-    }
+  handleFormSubmit = searchQuery => {
+    this.setState({ queryPage: 1, searchQuery, loading: true }, this.getImages);
   };
 
-  incrementPage() {
-    this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
-  }
-
+  handleLoadMore = () => {
+    this.setState((prevState) => ({ queryPage: prevState.queryPage + 1 }));
+  };
+  
   render() {
     const { loading, images, totalImages } = this.state;
 
@@ -84,18 +84,16 @@ export class App extends Component {
         <ImageGallery images={images} />
         {loading && <Loader />}
         {!loading && images.length > 0 && images.length < totalImages && (
-            <Button onClick={this.handleLoadMore} />            
+          <Button onClick={this.handleLoadMore} />
         )}
-        
       </>
     );
   }
 }
 
-
 // handleSubmit = (e) => {
-//   e.preventDefault();
-//   this.setState({ page: 1 }, this.fetchImages);
+// e.preventDefault();
+// this.setState({ page: 1 }, this.fetchImages);
 // };
 
 // handleLoadMore = () => {
