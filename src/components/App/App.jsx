@@ -12,10 +12,13 @@ export class App extends Component {
   state = {
     searchQuery: '',
     queryPage: 1,
+
     loading: false,
     images: [],
     totalImages: 0,
+
     error: false,
+    showModal: false,
   };
 
   handleFormSubmit = async searchQuery => {
@@ -88,3 +91,35 @@ export class App extends Component {
     );
   }
 }
+
+
+// handleSubmit = (e) => {
+//   e.preventDefault();
+//   this.setState({ page: 1 }, this.fetchImages);
+// };
+
+// handleLoadMore = () => {
+//   this.setState((prevState) => ({ page: prevState.page + 1 }));
+// };
+
+// fetchImages = async () => {
+//   const { query, page, images } = this.state;
+//   this.setState({ loading: true });
+//   const url = `${this.BASE_URL}&query=${query}&page=${page}&per_page=12`;
+//   const response = await fetch(url);
+//   const data = await response.json();
+//   this.setState({
+//     loading: false,
+//     images: page === 1 ? data.results : [...images, ...data.results],
+//   });
+// };
+
+// componentDidMount() {
+//   this.fetchImages();
+// }
+
+// componentDidUpdate(prevProps, prevState) {
+//   if (prevState.page !== this.state.page) {
+//     this.fetchImages();
+//   }
+// }
