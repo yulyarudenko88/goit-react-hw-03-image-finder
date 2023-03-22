@@ -28,7 +28,7 @@ export class App extends Component {
   }
 
   getImages = async () => {
-    const { searchQuery, queryPage } = this.state;
+    const { searchQuery, queryPage, images } = this.state;
     this.setState({ loading: true });
 
     if (searchQuery.trim() === '') {
@@ -39,25 +39,19 @@ export class App extends Component {
     } else {
       try {
         const { totalHits, hits } = await fetchImages(searchQuery, queryPage);
-        console.log(totalHits, hits);
+        // console.log(totalHits, hits);
 
         if (hits.length === 0) {
           toast.warn(
             'Sorry, there are no images matching your search query. Please try again.'
           );
           this.setState({ loading: false });
-        } else if (queryPage === 1) {
+        } else {
           this.setState({
-            images: hits,
+            images: queryPage === 1 ? hits : [...images, ...hits],
             totalImages: totalHits,
             loading: false,
           });
-        } else {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...hits],
-            loading: false,
-          }));
-          console.log('add new images')
         }
       } catch (error) {
         this.setState({ error: true });
@@ -70,9 +64,9 @@ export class App extends Component {
   };
 
   handleLoadMore = () => {
-    this.setState((prevState) => ({ queryPage: prevState.queryPage + 1 }));
+    this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
   };
-  
+
   render() {
     const { loading, images, totalImages } = this.state;
 
@@ -90,34 +84,3 @@ export class App extends Component {
     );
   }
 }
-
-// handleSubmit = (e) => {
-// e.preventDefault();
-// this.setState({ page: 1 }, this.fetchImages);
-// };
-
-// handleLoadMore = () => {
-//   this.setState((prevState) => ({ page: prevState.page + 1 }));
-// };
-
-// fetchImages = async () => {
-//   const { query, page, images } = this.state;
-//   this.setState({ loading: true });
-//   const url = `${this.BASE_URL}&query=${query}&page=${page}&per_page=12`;
-//   const response = await fetch(url);
-//   const data = await response.json();
-//   this.setState({
-//     loading: false,
-//     images: page === 1 ? data.results : [...images, ...data.results],
-//   });
-// };
-
-// componentDidMount() {
-//   this.fetchImages();
-// }
-
-// componentDidUpdate(prevProps, prevState) {
-//   if (prevState.page !== this.state.page) {
-//     this.fetchImages();
-//   }
-// }
