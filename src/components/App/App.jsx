@@ -55,6 +55,7 @@ export class App extends Component {
         }
       } catch (error) {
         this.setState({ error: true });
+        toast.error('Sorry, something go wrong! Try again!');
       }
     }
   };

@@ -1,10 +1,10 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
+import { VscSearch } from "react-icons/vsc";
 import {
   Header,
   SearchForm,
   SearchButton,
-  SearchFormLabel,
   SearchFormInput,
 } from './Searchbar.styled';
 
@@ -35,7 +35,7 @@ export default class Searchar extends Component {
       <Header>
         <SearchForm onSubmit={this.handleSubmit}>
           <SearchButton type="submit">
-            <SearchFormLabel>Search</SearchFormLabel>
+            <VscSearch size={20} />
           </SearchButton>
 
           <SearchFormInput

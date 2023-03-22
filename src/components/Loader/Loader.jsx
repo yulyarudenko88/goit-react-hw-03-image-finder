@@ -5,12 +5,12 @@ export const Loader = () => (
     height="80"
     width="80"
     radius="9"
-    color="#3f51b5"
+    color="rgb(177, 156, 217)"
     ariaLabel="loading"
     wrapperStyle={{
       display: 'flex',
       justifyContent: 'center',
-      marginTop: '20px',
+      marginTop: '15px',
     }}
   />
 );
