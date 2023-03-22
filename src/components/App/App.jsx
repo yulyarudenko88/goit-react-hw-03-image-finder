@@ -18,7 +18,7 @@ export class App extends Component {
     totalImages: 0,
 
     error: false,
-    showModal: false,
+    // showModal: false,
   };
 
   componentDidUpdate(_, prevState) {
@@ -39,7 +39,7 @@ export class App extends Component {
     } else {
       try {
         const { totalHits, hits } = await fetchImages(searchQuery, queryPage);
-        // console.log(totalHits, hits);
+        console.log(totalHits, hits);
 
         if (hits.length === 0) {
           toast.warn(
@@ -67,6 +67,7 @@ export class App extends Component {
     this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
   };
 
+  
   render() {
     const { loading, images, totalImages } = this.state;
 

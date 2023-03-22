@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 // import PropTypes from 'prop-types';
 import { Overlay, ImageModal } from './Modal.styled';
 
-const modalRoot = document.getElementById('modal-root');
+const modalRoot = document.querySelector('#modal-root');
 export class Modal extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.checkEvent);
@@ -15,17 +15,17 @@ export class Modal extends Component {
 
   checkEvent = e => {
     if (e.code === 'Escape' || e.target === e.currentTarget) {
-      // this.props.toggleModal({ status: false });
+      this.props.onClose();
     }
   };
 
   render() {
-    const { src, alt } = this.props;
+    const { children } = this.props;
 
     return createPortal(
       <Overlay onClick={this.checkEvent}>
         <ImageModal>
-          <img src={src} alt={alt} />
+        { children }
         </ImageModal>
       </Overlay>,
       modalRoot
