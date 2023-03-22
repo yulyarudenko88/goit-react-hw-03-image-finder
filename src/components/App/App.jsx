@@ -8,97 +8,82 @@ import { ImageGallery } from 'components/ImageGallery/ImageGallery';
 import { Button } from 'components/Button/Button';
 import { Loader } from 'components/Loader/Loader';
 
-const STATUS = {
-  IDLE: 'idle',
-  PENDING: 'pending',
-  REJECTED: 'rejected',
-  RESOLVED: 'resolved',
-};
-
 export class App extends Component {
-  // state = {
-  //   pokemon: null,
-  //   error: null,
-  //   status: Status.IDLE,
-  // };
   state = {
-    searchWord: '',
-    images: [],
-    totalHits: 0,
+    searchQuery: '',
     queryPage: 1,
-    status: STATUS.IDLE,
+    loading: false,
+    images: [],
+    totalImages: 0,
+    error: false,
   };
 
-  handleFormSubmit = async searchWord => {
-    this.setState({ queryPage: 1, searchWord });
+  handleFormSubmit = async searchQuery => {
+    this.setState({ queryPage: 1, searchQuery, loading: true, });
     const { queryPage } = this.state;
-    console.log(this.state);
-    
-    if (searchWord.trim() === '') {
+    // console.log(this.state);
+
+    if (searchQuery.trim() === '') {
       toast.info('You cannot search by empty field, try again.');
+      this.setState({ loading: false, });
       return;
     } else {
       try {
-        this.setState({ status: STATUS.PENDING });
-
-        const { totalHits, hits } = await fetchPhotos(searchWord, queryPage);
-        console.log(totalHits, hits);        
+        const { totalHits, hits } = await fetchPhotos(searchQuery, queryPage);
+        // console.log(totalHits, hits);
         if (hits.length === 0) {
-          this.setState({ status: STATUS.IDLE });
           toast.warn(
             'Sorry, there are no images matching your search query. Please try again.'
           );
+          this.setState({ loading: false, });
         } else {
           this.setState({
             images: hits,
-            totalHits,
-            status: STATUS.RESOLVED,
-          });          
+            totalImages: totalHits,
+            loading: false,
+          });
         }
       } catch (error) {
-        this.setState({ status: STATUS.REJECTED });
+        this.setState({ error: true, });
       }
     }
   };
 
   handleLoadMore = async () => {
-    this.setState({ queryPage: this.incrementPage(), status: STATUS.PENDING });
-    const { queryPage } = this.state;
-    console.log(this.state);
+    this.setState({ queryPage: () => this.incrementPage(), loading: true, });
+    const { searchQuery, queryPage } = this.state;
+    // console.log(this.state);
     try {
-      const results = await fetchPhotos(queryPage);
-      console.log(results);
+      const results = await fetchPhotos(searchQuery, queryPage);
       const { hits } = results;
 
       this.setState(prevState => ({
         images: [...prevState.images, ...hits],
-        status: STATUS.RESOLVED,
+        loading: false,
       }));
     } catch (error) {
-      this.setState({ status: STATUS.REJECTED });
+      this.setState({ error: true, });
     }
   };
 
-   incrementPage() {
+  incrementPage() {
     this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
   }
 
   render() {
-    const { images, status } = this.state;
+    const { loading, images, totalImages } = this.state;
+
     return (
       <>
         <Searchbar onSubmit={this.handleFormSubmit} />
         <ToastContainer autoClose={3000} />
 
-        {status === STATUS.PENDING && <Loader />}
-        {status === STATUS.RESOLVED && (
-          <>
-            <ImageGallery images={images} />
-            <Button onClick={this.handleLoadMore} />
-          </>
+        <ImageGallery images={images} />
+        {loading && <Loader />}
+        {!loading && images.length > 0 && images.length < totalImages && (
+            <Button onClick={this.handleLoadMore} />            
         )}
-        {status === STATUS.REJECTED &&
-          toast.error('Something wrong, try again.')}
+        
       </>
     );
   }

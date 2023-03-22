@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
-import { createPortal } from 'react-dom';
-import PropTypes from 'prop-types';
-import { Overlay, ImageModal } from './Modal.styled';
+import { Component } from 'react';
+// import { createPortal } from 'react-dom';
+// import PropTypes from 'prop-types';
+// import { Overlay, ImageModal } from './Modal.styled';
 
 export class Modal extends Component {
   state = {
@@ -22,17 +22,17 @@ export class Modal extends Component {
     }
   };
 
-  render() {
-    // const { src, alt } = this.props;
+  // render() {
+  //   // const { src, alt } = this.props;
 
-    return (
-      createPortal(<Overlay onClick={this.checkEvent}>
-        <ImageModal>
-          {/* <img src={src} alt={alt} /> */}
-        </ImageModal>
-      </Overlay>,
-      modalRoot
-    )
-    );
+  //   return (
+  //     createPortal(<Overlay onClick={this.checkEvent}>
+  //       <ImageModal>
+  //         {/* <img src={src} alt={alt} /> */}
+  //       </ImageModal>
+  //     </Overlay>,
+  //     modalRoot
+  //   )
+  //   );
   }
-}
+// }
