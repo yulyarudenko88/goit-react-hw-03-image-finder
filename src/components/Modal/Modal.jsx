@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
+import PropTypes from 'prop-types';
 import { Overlay, ImageModal } from './Modal.styled';
 
 export class Modal extends Component {
+  state = {
+    isOpenModal: null,
+  };
+
   componentDidMount() {
     window.addEventListener('keydown', this.checkEvent);
   }
@@ -20,11 +26,13 @@ export class Modal extends Component {
     // const { src, alt } = this.props;
 
     return (
-      <Overlay onClick={this.checkEvent}>
+      createPortal(<Overlay onClick={this.checkEvent}>
         <ImageModal>
           {/* <img src={src} alt={alt} /> */}
         </ImageModal>
-      </Overlay>
+      </Overlay>,
+      modalRoot
+    )
     );
   }
 }
