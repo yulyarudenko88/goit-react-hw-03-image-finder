@@ -7,9 +7,7 @@ export const LoadMoreBtn = styled.button`
   transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   display: block;
-  margin-top: 15px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 15px auto;
   color: #fff;
   border: 0;
   text-decoration: none;

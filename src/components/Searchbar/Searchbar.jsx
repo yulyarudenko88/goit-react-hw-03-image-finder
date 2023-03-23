@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import PropTypes from 'prop-types';
-import { VscSearch } from "react-icons/vsc";
+import { VscSearch } from 'react-icons/vsc';
 import {
   Header,
   SearchForm,
@@ -30,7 +30,7 @@ export default class Searchar extends Component {
 
   render() {
     const { searchWord } = this.state;
-    
+
     return (
       <Header>
         <SearchForm onSubmit={this.handleSubmit}>

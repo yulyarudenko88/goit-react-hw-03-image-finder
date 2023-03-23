@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { animateScroll } from 'react-scroll';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -18,7 +19,6 @@ export class App extends Component {
     totalImages: 0,
 
     error: false,
-    // showModal: false,
   };
 
   componentDidUpdate(_, prevState) {
@@ -45,7 +45,7 @@ export class App extends Component {
           toast.warn(
             'Sorry, there are no images matching your search query. Please try again.'
           );
-          this.setState({ loading: false });
+          this.setState({ images: [], loading: false });
         } else {
           this.setState({
             images: queryPage === 1 ? hits : [...images, ...hits],
@@ -62,13 +62,14 @@ export class App extends Component {
 
   handleFormSubmit = searchQuery => {
     this.setState({ queryPage: 1, searchQuery, loading: true }, this.getImages);
+    animateScroll.scrollToTop({ duration: 500, smooth: 'easeInOutQuart' });
   };
 
   handleLoadMore = () => {
     this.setState(prevState => ({ queryPage: prevState.queryPage + 1 }));
+    animateScroll.scrollToBottom({ duration: 500, smooth: 'easeInOutQuart' });
   };
 
-  
   render() {
     const { loading, images, totalImages } = this.state;
 
